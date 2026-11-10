@@ -7,13 +7,14 @@
 /* is the app running? */
 typedef struct {
     bool running;
-    int square_pos;
+    int square_posX;
+    int square_posY;
 } AppState;
 
 /* drawing canvas on screen stuff*/
 static void draw_callback(Canvas* canvas, void* ctx) {
     AppState* state = ctx;
-    canvas_draw_box(canvas, state->square_pos, 28, 8, 8);
+    canvas_draw_box(canvas, state->square_posX, state->square_posY, 8, 8);
 }
 
 /* button stuff*/
@@ -24,19 +25,27 @@ static void input_callback(InputEvent* event, void* ctx) {
             state->running = false;
         }
         if(event->key == InputKeyRight) {
-            state->square_pos = state->square_pos + 1;
+            state->square_posX = state->square_posX + 1;
         }
         if(event->key == InputKeyLeft) {
-            state->square_pos = state->square_pos - 1;
+            state->square_posX = state->square_posX - 1;
+        }
+        if(event->key == InputKeyUp) {
+            state->square_posY = state->square_posY - 1;
+        }
+        if(event->key == InputKeyDown) {
+            state->square_posY = state->square_posY + 1;
         }
     }
 }
 
+/* Main stuff */
 int32_t pokegatchi_app(void* p) {
     UNUSED(p);
     AppState state;
     state.running = true;
-    state.square_pos = 60;
+    state.square_posX = 60;
+    state.square_posY = 28;
     ViewPort* view_port = view_port_alloc();
     view_port_draw_callback_set(view_port, draw_callback, &state);
     view_port_input_callback_set(view_port, input_callback, &state);
