@@ -6,17 +6,19 @@
 
 typedef struct {
     bool running;
-    int square_posX;
-    int square_posY;
     int hunger;
+    int happiness;
 } AppState;
 
 /* drawing canvas on screen stuff*/
 static void draw_callback(Canvas* canvas, void* ctx) {
     AppState* state = ctx;
-    canvas_draw_box(canvas, state->square_posX, state->square_posY, 8, 8);
+    //Need Bars
     canvas_draw_frame(canvas, 10, 4, 102, 8);
+    //                        x   y  width height
     canvas_draw_box(canvas, 11, 5, state->hunger, 6);
+    canvas_draw_frame(canvas, 10, 16, 102, 8);
+    canvas_draw_box(canvas, 11, 17, state->happiness, 6);
 }
 
 /* button stuff*/
@@ -26,18 +28,6 @@ static void input_callback(InputEvent* event, void* ctx) {
         if(event->key == InputKeyBack) {
             state->running = false;
         }
-        if(event->key == InputKeyRight) {
-            state->square_posX = state->square_posX + 1;
-        }
-        if(event->key == InputKeyLeft) {
-            state->square_posX = state->square_posX - 1;
-        }
-        if(event->key == InputKeyUp) {
-            state->square_posY = state->square_posY - 1;
-        }
-        if(event->key == InputKeyDown) {
-            state->square_posY = state->square_posY + 1;
-        }
     }
 }
 
@@ -46,9 +36,8 @@ int32_t pokegatchi_app(void* p) {
     UNUSED(p);
     AppState state;
     state.running = true;
-    state.square_posX = 60;
-    state.square_posY = 28;
     state.hunger = 50;
+    state.happiness = 50;
     int ticks = 0;
     ViewPort* view_port = view_port_alloc();
     view_port_draw_callback_set(view_port, draw_callback, &state);
@@ -58,8 +47,11 @@ int32_t pokegatchi_app(void* p) {
 
     while(state.running) {
         ticks = ticks + 1;
-        if(ticks >= 20) { /*Hunger*/
-            if(state.hunger > 0) state.hunger = state.hunger - 1;
+        if(ticks >= 20) {
+            if(state.hunger > 0) /*Hunger*/
+                state.hunger = state.hunger - 1;
+            if(state.happiness > 0) /*Happiness*/
+                state.happiness = state.happiness - 1;
             furi_delay_ms(50);
         }
         view_port_update(view_port);
